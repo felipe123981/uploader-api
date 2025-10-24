@@ -30,7 +30,7 @@ class SendForgotPasswordEmailService {
         name: user.name,
         email: user.email,
       },
-      subject: '[Sugarbay Team] Password reset:',
+      subject: '[web developer team] Password reset:',
       templateData: {
         file: forgotPasswordTemplate,
         variables: {
