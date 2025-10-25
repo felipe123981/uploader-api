@@ -6,6 +6,8 @@ import routes from './routes';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { env } from 'process';
+import uploadConfig from '@config/upload';
+import errorHandler from './middlewares/errorHandler';
 
 const options = {
   definition: {
@@ -25,8 +27,10 @@ app.use(cors());
 app.use(express.json());
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(routes);
+app.use('/files', express.static(uploadConfig.directory));
 
 app.listen(3333, () => {
   console.log(`Server running on port ${env.PORT}! 🏆`)
       console.log('API docs available at GET /docs 📚')
 });
+app.use(errorHandler);

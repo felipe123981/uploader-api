@@ -1,9 +1,15 @@
 import { celebrate, Joi, Segments } from 'celebrate';
 import { Router } from 'express';
 import UsersController from '../controllers/UsersController';
+import isAuthenticated from '@shared/http/middlewares/isAuthenticated';
+import UserAvatarController from '../controllers/UserAvatarController';
+import multer from 'multer';
+import uploadConfig from '@config/upload';
 
 const usersRouter = Router();
 const usersController = new UsersController();
+const userAvatarController = new UserAvatarController();
+const upload = multer(uploadConfig);
 
 /**
  * @swagger
@@ -369,6 +375,60 @@ usersRouter.delete(
     },
   }),
   usersController.delete,
+);
+
+/**
+ * @swagger
+ * /users/avatar:
+ *   patch:
+ *     summary: Update the authenticated user's avatar
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file (accepted .jpg, .jpeg, .png, .webp)
+ *             required:
+ *               - avatar
+ *     responses:
+ *       200:
+ *         description: Avatar updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserResponse'
+ *       400:
+ *         description: Invalid file type, file too large, or no file provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized — user not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+usersRouter.patch(
+  '/avatar',
+  isAuthenticated,
+  upload.single('avatar'),
+  userAvatarController.update,
 );
 
 export default usersRouter;

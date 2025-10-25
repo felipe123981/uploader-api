@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
+import { env } from 'src/env';
 
 @Entity('users')
 class User {
@@ -37,7 +38,7 @@ class User {
       return null;
     }
 
-    return `${process.env.APP_API_URL}/files/${this.avatar}`;
+    return `${env.API_URL}/files/${this.avatar}`;
   }
 }
 
